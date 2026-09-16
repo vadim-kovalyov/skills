@@ -54,6 +54,14 @@ Every ticket carries a `wayfinder:<type>` label. Each ticket is either **[HITL](
 
 Research is the only exception to *one ticket per session*.
 
+## Questions stay in the transcript
+
+Wayfinder uses the conversation and the input form for different jobs. The full grilling round is printed in the conversation: each numbered question, its context and trade-offs, and the agent's recommendation. That output remains available when you scroll back through a long map.
+
+The `ask_user` form that follows contains only the answer controls. Multiple-choice questions become concise options, yes/no decisions become toggles, and open decisions get a short text field. Each field carries the same question number as the printed round, so the compact form maps back to the durable explanation without repeating it in a small window.
+
+If a Wayfinder session puts the complete questions only inside the form, it has broken this presentation contract. The form is where you answer; the conversation is where the question history lives.
+
 ## Common questions
 
 **How is this different from `/grill-with-docs`? Which should I start with?**
@@ -78,7 +86,7 @@ The frontier shows you which tickets you can take, and blocking edges make paral
 No. Any issue tracker works. GitHub has the best support, because its native sub-issues and blocking relationships make the frontier visible without opening the map. People also use GitLab, Linear, Jira and local markdown. There are two caveats. On a tracker with no native blocking, wayfinder infers the dependency graph from text, and you must correct it by hand. Local markdown puts the artifacts in your repo, which is not recommended, because material stored in the repo tends to persist by accident. Open-source maintainers hit the opposite problem (public trackers fill up with agent-generated planning tickets) and often choose local markdown anyway.
 
 **The grilling is exhausting. Every question is three paragraphs long.**
-This is the sharpest open complaint about wayfinder, and nobody has fixed it yet. One user broke it down this way: the verbosity itself causes decision exhaustion, and the length hides *why* the agent asks a question, so you lose the chain from decision to decision as the map grows. The verbosity looks like a property of the current set of [models](https://www.aihero.dev/ai-coding-dictionary/model) rather than of the skill. Users try two mitigations: a lower [reasoning effort](https://www.aihero.dev/ai-coding-dictionary/effort), and a plain-language instruction in your global `CLAUDE.md`. Expect to think hard here anyway. Wayfinder demands a lot of thinking from you, and that is most of its purpose, not a defect.
+The questions still carry the context and trade-offs needed to make a real decision, but they now live in the conversation rather than disappearing inside the small input form. The form carries only concise answer controls mapped back by question number. This fixes the lost-history and cramped-window parts of the complaint; it does not make a genuinely difficult decision cheap. A lower [reasoning effort](https://www.aihero.dev/ai-coding-dictionary/effort) or a plain-language instruction in your global `CLAUDE.md` can still reduce prose when a model runs long.
 
 **A decision I already closed turned out to be wrong. Do I edit the old ticket or make a new one?**
 There is no official guidance, and the agent's default is unhelpful. It tends to design around the bad decision instead of challenging it, so you must steer it yourself. What works is to tell wayfinder plainly what changed. It then updates the map, revises the affected tickets, and comments on the closed ones. You can recover from scope changes mid-map. But if you *designed* a map to change, that is a sign the scope is wrong.
@@ -89,6 +97,7 @@ It is this skill. v1.1 renamed it to `wayfinder`, and you invoke it as `/wayfind
 ## It's working if
 
 - The destination is written down and agreed before a single ticket exists.
+- Each HITL round leaves its full numbered questions and recommendations in the conversation, with only concise answer controls in `ask_user`.
 - Every open ticket reads as a question. Any ticket that reads "build the X" is either mis-typed or belongs downstream of the map.
 - You can look at your tracker and see which tickets are takeable without opening the map, because native blocking shows the frontier.
 - A session resolves one ticket, posts the answer as a resolution comment, closes it, and adds one line to the map's *Decisions so far*. Then it stops.

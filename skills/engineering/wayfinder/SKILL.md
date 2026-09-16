@@ -79,6 +79,27 @@ Every ticket is either **HITL** (human in the loop, worked _with_ a human who sp
 - **Grilling** (HITL): Conversation. The default case. Always call the Skill tool twice, for "grilling" and "domain-modeling".
 - **Task** (HITL or AFK): Manual work that must happen before a _decision_ can be made: nothing to decide, prototype, or research, but the discussion is blocked until it's done. Signing up for a service so its API can be judged, provisioning access, moving data so its shape can be seen. This is the one type that _does_ rather than decides, and it earns its place by unblocking a decision, not by delivering the destination. The agent drives it alone where it can (AFK); otherwise it hands the human a precise checklist (HITL). Resolved when the work is done; the answer records what was done and any resulting facts (credentials location, new URLs, row counts) later tickets depend on.
 
+## HITL question presentation
+
+Wayfinding questions must remain visible in the conversation history. For every grilling round, use two surfaces together:
+
+1. **Conversation output holds the questions.** Print the complete numbered round in the assistant response, including the context, trade-offs, choices, and recommended answer for each question. This is the durable record the human can scroll back to.
+2. **`ask_user` holds only the answer controls.** In the same response, call `ask_user` with one field per numbered question. Keep its message short and point back to the printed round. Use an enum when the question has known options, a boolean for yes/no, and a free-text field when the answer is open. Field titles start with the matching question number and a short label. Option labels stay concise; the full question and explanation are not repeated in the form.
+
+Example:
+
+```markdown
+**Q1 - Destination artifact**
+
+Should this map end at an approved specification or at a decision recorded in place?
+
+Recommendation: approved specification, because implementation spans several sessions and needs one stable handoff artifact.
+```
+
+Then call `ask_user` with a field titled `Q1 - Destination artifact` and concise options such as `Approved specification` and `Decision recorded in place`.
+
+Never put the full round only inside `ask_user`. The form is an input surface, not the question history.
+
 ## Fog of war
 
 The map is _deliberately_ incomplete: don't chart what you can't yet see. Beyond the live tickets lies the **fog of war**: the dim view of decisions and investigations you can tell are coming but can't yet pin down, because they hang on questions still open. Resolving a ticket clears the fog ahead of it, graduating whatever's now specifiable into fresh tickets, one at a time, until the way to the destination is clear and no tickets remain.
