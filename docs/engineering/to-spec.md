@@ -33,6 +33,8 @@ Before it writes anything, `to-spec` sketches the **seams** where the feature wi
 
 Other skills use those agreed seams later. [tdd](https://aihero.dev/skills-tdd) works only at seams you agreed in advance. [code-review](https://aihero.dev/skills-code-review) reviews the diff against the spec, so a seam nobody agreed to shows up as a review finding. Both connections go through this document. That is why you should take the seam conversation seriously here, and not leave it for implementation.
 
+The template now uses **Behavioral Requirements** rather than forcing every change into user-story grammar. User-facing work can still use "As a..." stories. Libraries, protocols, infrastructure, and systems work state caller capabilities and invariants directly, including failure, cancellation, shutdown, resource, target, feature, MSRV, ABI, and performance contracts where they apply. Rust systems specs load [rust-systems-engineering](https://aihero.dev/skills-rust-systems-engineering) to keep those constraints explicit.
+
 ## Common questions
 
 **Where did `/to-prd` go?**
@@ -53,8 +55,8 @@ Mostly for the agent, and it reads that way: complete, dense, and full of refere
 **Do I keep the spec frozen once tickets start, or let the agent rewrite it?**
 Nothing keeps it in sync. In practice it is a snapshot of what you knew at that moment, and it goes out of date the first time implementation teaches you something. Treat it as disposable after the work ships. Your `GLOSSARY.md` and ADRs are the files meant to last. If you learn something during implementation that should last, put it there, not in an edited spec.
 
-**My work is a refactor or a module boundary, not a feature. Does the template fit?**
-Less well, and this is a known limitation. The template relies heavily on user stories, which do not fit architectural work. You end up writing stories nobody asked for around decisions that are really about interfaces and invariants. Use the implementation-decisions and testing-decisions sections instead. Record the lasting architectural decisions as ADRs through [grill-with-docs](https://aihero.dev/skills-grill-with-docs), not in the spec.
+**My work is a refactor, protocol, library, or module boundary, not a user-facing feature. Does the template fit?**
+Yes. Use caller capabilities and invariants under Behavioral Requirements instead of inventing user stories. Durable architectural calls still belong in ADRs via [grill-with-docs](https://aihero.dev/skills-grill-with-docs); the spec carries the behavior and constraints the implementation must preserve.
 
 **Will it check the tracker for related work, or cite the ADRs it's respecting?**
 No to both. It reads and follows the ADRs for the area it touches, but it does not link them. It also does not search the tracker for overlapping issues before it writes, so a spec can duplicate work that someone already filed, and nothing warns you. If the area is busy, search the tracker yourself first.
@@ -67,6 +69,7 @@ A tracker issue may not return a very large spec in full, and there is no local 
 - It starts writing instead of asking you a new round of questions.
 - It shows you the seams before it writes, and proposes as few as it can.
 - It uses your project's nouns, not generic product-management boilerplate.
+- Systems work names failure, cancellation, shutdown, resource, compatibility, and performance behavior where callers depend on it.
 - You remember making every decision in it. It invented nothing to fill a section.
 - The out-of-scope section lists real things. The things you refused are usually the most useful lines on the page.
 

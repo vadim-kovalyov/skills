@@ -2,7 +2,7 @@
 
 `tdd` builds a feature or fixes a bug test-first: one failing test, then just enough code to pass it, then the next behaviour. It carries the standards that make that loop produce tests worth keeping: what a good test is, where tests go, what mocks are for, and the three anti-patterns that make a suite worthless.
 
-It writes no test at a seam you have not agreed to first. Before any test exists, it names the public boundaries it intends to test at and stops for your confirmation. Testing effort is finite, and this step spends it on the critical paths instead of on every edge case. `tdd` is also a **reference**, not a driver. It contains the rules of the loop, and something else (you, or [implement](https://aihero.dev/skills-implement)) runs the [session](https://www.aihero.dev/ai-coding-dictionary/session) that applies them.
+It writes no test at a seam you have not agreed to first. Before any test exists, it names the stable boundaries it intends to test at and stops for your confirmation. Testing effort is finite, and this step spends it on the critical paths instead of on every edge case. It prefers public interfaces, but allows a lower module-local seam when that is the only faithful place to test an unsafe invariant, parser state, algorithm, or failure. `tdd` is also a **reference**, not a driver. It contains the rules of the loop, and something else (you, or [implement](https://aihero.dev/skills-implement)) runs the [session](https://www.aihero.dev/ai-coding-dictionary/session) that applies them.
 
 ## When to reach for it
 
@@ -32,7 +32,9 @@ The skill rests on three terms.
 
 **Vertical slice.** Write one test at one seam, then the minimal implementation, then repeat. The first cycle is a **tracer bullet** that proves a single path end to end. The opposite is horizontal slicing: all the tests first, then all the code. Tests written in bulk verify *imagined* behaviour. They check the shape of things rather than what a user does, and they commit you to a test structure before you understand the implementation.
 
-**Pre-agreed seam.** A seam is the public boundary you observe behaviour at without reaching inside. The rule has no exceptions. No test goes at an unconfirmed seam. In the full chain the seams are agreed earlier, during [to-spec](https://aihero.dev/skills-to-spec): "`/tdd` is told to only work at pre-agreed test seams, `/code-review` checks that only agreed-upon test seams were used." Invoked on its own, `tdd` asks you directly.
+**Pre-agreed seam.** A seam is the stable boundary where you observe behaviour without coupling the test to incidental structure. The rule has no exceptions. No test goes at an unconfirmed seam. The height of that seam is not absolute. Rust module tests may reach private code when a named invariant cannot be exercised faithfully above it. In the full chain the seams are agreed earlier, during [to-spec](https://aihero.dev/skills-to-spec). Invoked on its own, `tdd` asks you directly.
+
+For Rust systems work, [rust-systems-engineering](https://aihero.dev/skills-rust-systems-engineering) adds the test shapes that match the risk: compile-fail cases for type contracts, properties or fuzz targets for input spaces, deterministic concurrency harnesses for interleavings, and existing Miri or sanitizer checks for unsafe behavior.
 
 The three anti-patterns it is written to prevent:
 
@@ -80,7 +82,8 @@ No. Run against one ticket, it can propose work that belongs to a sibling ticket
 - One test appears, goes red, gets just enough code to pass, and only then does the next test appear, not a batch of tests followed by a batch of code.
 - Test names read as capabilities ("user can checkout with valid cart"), not as internals ("checkout calls paymentService.process").
 - Expected values in assertions are literals you can trace to the spec, not values recomputed the way the code computes them.
-- Renaming an internal function breaks nothing in the suite.
+- Renaming incidental internal structure breaks nothing in the suite.
+- A Rust systems test states why its seam and test shape match the invariant or risk.
 - Mocks appear only at external boundaries (the payment API, the clock) and never around your own modules.
 
 ## Where it fits

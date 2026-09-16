@@ -33,7 +33,9 @@ It starts each section with the recommended answer, and skips any question its e
 | --- | --- | --- |
 | **Issue tracker** | the one matching your `git remote` | always, because this is the one real choice |
 | **Triage labels** | keep the five canonical names (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`) | only if the `triage` skill is installed |
-| **Domain docs** | single-context: one `GLOSSARY.md` plus `docs/adr/` at the root | only if it spots monorepo signals, and then it offers a multi-context `GLOSSARY-MAP.md` |
+| **Domain docs** | single-context: one `GLOSSARY.md` plus `docs/adr/` at the root | only if it spots a genuinely domain-distinct package or Cargo workspace, and then it offers a multi-context `GLOSSARY-MAP.md` |
+
+Several Cargo workspace members do not automatically mean several domain contexts. The skill looks for separate interfaces and vocabulary across members, not only a `crates/` directory.
 
 The tracker options:
 

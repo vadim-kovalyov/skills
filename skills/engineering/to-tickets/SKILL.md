@@ -20,6 +20,8 @@ Work from whatever is already in the conversation context. If the user passes a 
 
 If you have not already explored the codebase, do so to understand the current state of the code. Ticket titles and descriptions should use the project's domain glossary vocabulary, and respect ADRs in the area you're touching.
 
+If the work changes Rust or Cargo code, or crosses an unsafe, FFI, concurrency, async, operating-system, embedded, compatibility, or performance-sensitive boundary, call the Skill tool with "rust-systems-engineering". Use its contracts and validation ladder when defining complete slices and acceptance criteria.
+
 Look for opportunities to prefactor the code to make the implementation easier. "Make the change easy, then make the easy change."
 
 ### 3. Draft vertical slices
@@ -28,9 +30,10 @@ Break the work into **tracer bullet** tickets.
 
 <vertical-slice-rules>
 
-- Each slice cuts a narrow but COMPLETE path through every layer (schema, API, UI, tests): vertical, NOT a horizontal slice of one layer
+- Each slice cuts a narrow but COMPLETE observable path through every relevant boundary: input, state transition, protocol, storage, process, library interface, output, and verification as applicable. It is vertical, not a horizontal slice of one code layer.
 - A completed slice is demoable or verifiable on its own
 - Each slice is sized to fit in a single fresh context window
+- Each slice keeps the repository's required workspace, feature, target, and compatibility checks green, unless an explicitly named integration sequence owns that temporary break
 - Any prefactoring should be done first
 
 </vertical-slice-rules>

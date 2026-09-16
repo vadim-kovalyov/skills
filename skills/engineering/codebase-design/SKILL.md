@@ -7,6 +7,8 @@ description: Shared vocabulary for designing deep modules. Use when the user wan
 
 Design **deep modules**: a lot of behaviour behind a small interface, placed at a clean seam, testable through that interface. Use this language and these principles wherever code is being designed or restructured. The aim is leverage for callers, locality for maintainers, and testability for everyone.
 
+When designing Rust or Cargo code, or an unsafe, FFI, concurrency, async, operating-system, embedded, or performance-sensitive interface, call the Skill tool with "rust-systems-engineering". Its contract, ownership, resource, compatibility, and performance questions are part of the interface.
+
 ## Glossary
 
 Use these terms exactly: don't substitute "component," "service," "API," or "boundary." Consistent language is the whole point.
@@ -62,13 +64,15 @@ When designing an interface, ask:
 - **Depth is a property of the interface, not the implementation.** A deep module can be internally composed of small, mockable, swappable parts; they just aren't part of the interface. A module can have **internal seams** (private to its implementation, used by its own tests) as well as the **external seam** at its interface.
 - **The deletion test.** Imagine deleting the module. If complexity vanishes, it was a pass-through. If complexity reappears across N callers, it was earning its keep.
 - **The interface is the test surface.** Callers and tests cross the same seam. If you want to test *past* the interface, the module is probably the wrong shape.
-- **One adapter means a hypothetical seam. Two adapters means a real one.** Don't introduce a seam unless something actually varies across it.
+- **One adapter usually means a hypothetical seam. Two adapters usually means a real one.** A single adapter can still earn the seam when it expresses an external contract, isolates platform or unsafe code, controls resource ownership, or enables a compile-time substitution the design requires. Demand a concrete source of variation or risk, not a second implementation for its own sake.
 
 ## Designing for testability
 
 Good interfaces make testing natural:
 
-1. **Accept dependencies, don't create them.**
+1. **Make dependencies explicit.**
+
+   Pass or construct dependencies at the composition point instead of hiding their creation inside the behavior under test.
 
    ```typescript
    // Testable
@@ -80,7 +84,9 @@ Good interfaces make testing natural:
    }
    ```
 
-2. **Return results, don't produce side effects.**
+2. **Make effects and ownership explicit.**
+
+   Return values when the operation is a calculation. When the module owns effects, expose their errors and ordering in the interface so callers do not need implementation knowledge to use it correctly.
 
    ```typescript
    // Testable
@@ -105,7 +111,7 @@ Good interfaces make testing natural:
 ## Rejected framings
 
 - **Depth as ratio of implementation-lines to interface-lines** (Ousterhout): rewards padding the implementation. We use depth-as-leverage instead.
-- **"Interface" as the TypeScript `interface` keyword or a class's public methods**: too narrow: interface here includes every fact a caller must know.
+- **"Interface" as a language keyword, trait declaration, or a type's public methods**: too narrow: interface here includes every fact a caller must know.
 - **"Boundary"**: overloaded with DDD's bounded context. Say **seam** or **interface**.
 
 ## Going deeper

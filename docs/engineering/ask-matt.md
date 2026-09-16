@@ -30,7 +30,9 @@ The skill's leading word is **flow**, a path *through* the skills rather than a 
 - **On-ramps**, for a situation that generates work and then merges onto the main flow: incoming bug reports, something broken, or an effort too foggy and too large to hold in one session.
 - **Codebase health**, upkeep rather than feature work. [improve-codebase-architecture](https://aihero.dev/skills-improve-codebase-architecture) surveys the code for deepening opportunities, and each one it finds re-enters the main flow as an idea.
 - **Standalones**, which sit off every flow and which you use on their own: the prototype, the questionnaire, the research run.
-- **A vocabulary layer underneath**, the two references the other skills pull in when the words rather than the process are the problem.
+- **A reference layer underneath**, the three references other skills pull in when domain language, module shape, or Rust systems constraints are the problem.
+
+That layer contains [domain-modeling](https://aihero.dev/skills-domain-modeling), [codebase-design](https://aihero.dev/skills-codebase-design), and [rust-systems-engineering](https://aihero.dev/skills-rust-systems-engineering). The Rust reference carries contracts, unsafe and FFI proof obligations, concurrency, resources, compatibility, performance, and validation into the existing implementation, testing, debugging, design, review, spec, ticket, and prototype flows.
 
 ## The phase boundary
 

@@ -9,6 +9,8 @@ A discipline for hard bugs. Skip phases only when explicitly justified.
 
 When exploring the codebase, read `GLOSSARY.md` (if it exists) to get a clear mental model of the relevant modules, and check ADRs in the area you're touching.
 
+When the failing path contains Rust or Cargo code, unsafe code, FFI, concurrency, async runtimes, operating-system boundaries, embedded targets, or performance-sensitive systems code, call the Skill tool with "rust-systems-engineering".
+
 ## Redact
 
 This skill has you show commands, outputs and captured artifacts. **Redact every secret first**: write `<REDACTED>` in its place. Build loops against env vars, so the credential stays in the environment rather than in what you show. Captured artifacts carry auth headers: quote only the lines that carry the signal.
@@ -26,13 +28,15 @@ Spend disproportionate effort here. **Be aggressive. Be creative. Refuse to give
 1. **Failing test** at whatever seam reaches the bug: unit, integration, e2e.
 2. **Curl / HTTP script** against a running dev server.
 3. **CLI invocation** with a fixture input, diffing stdout against a known-good snapshot.
-4. **Headless browser script** (Playwright / Puppeteer) that drives the UI and asserts on DOM/console/network.
-5. **Replay a captured trace.** Save a real network request / payload / event log to disk; replay it through the code path in isolation.
-6. **Throwaway harness.** Spin up a minimal subset of the system (one service, mocked deps) that exercises the bug code path with a single function call.
-7. **Property / fuzz loop.** If the bug is "sometimes wrong output", run 1000 random inputs and look for the failure mode.
-8. **Bisection harness.** If the bug appeared between two known states (commit, dataset, version), automate "boot at state X, check, repeat" so you can `git bisect run` it.
-9. **Differential loop.** Run the same input through old-version vs new-version (or two configs) and diff outputs.
-10. **HITL bash script.** Last resort. If a human must click, drive _them_ with `scripts/hitl-loop.template.sh` so the loop is still structured. Captured output feeds back to you.
+4. **Process or systems harness** that asserts on exit status, signals, output bytes, resource counts, system calls, or a captured crash.
+5. **Headless browser script** (Playwright / Puppeteer) that drives the UI and asserts on DOM/console/network.
+6. **Replay a captured trace.** Save a real network request, payload, event log, protocol stream, syscall trace, or core dump; replay or inspect it through the code path in isolation.
+7. **Throwaway harness.** Spin up a minimal subset of the system that exercises the bug code path with fixed dependencies and one invocation.
+8. **Property / fuzz loop.** If the bug is "sometimes wrong output", run many generated inputs and look for the failure mode.
+9. **Stress or schedule loop.** Raise the reproduction rate for races, deadlocks, cancellation bugs, and resource leaks with controlled scheduling, fault injection, or repeated parallel execution.
+10. **Bisection harness.** If the bug appeared between two known states (commit, dataset, version), automate "boot at state X, check, repeat" so you can `git bisect run` it.
+11. **Differential loop.** Run the same input through old-version vs new-version, two targets, or two configs and diff outputs.
+12. **HITL bash script.** Last resort. If a human must click, drive _them_ with `scripts/hitl-loop.template.sh` so the loop is still structured. Captured output feeds back to you.
 
 Build the right feedback loop, and the bug is 90% fixed.
 
@@ -103,13 +107,14 @@ Each probe must map to a specific prediction from Phase 3. **Change one variable
 
 Tool preference:
 
-1. **Debugger / REPL inspection** if the env supports it. One breakpoint beats ten logs.
-2. **Targeted logs** at the boundaries that distinguish hypotheses.
-3. Never "log everything and grep".
+1. **Debugger / REPL inspection** if the environment supports it. One breakpoint or watchpoint beats ten logs.
+2. **Boundary-specific system evidence** such as a backtrace, core dump, sanitizer report, syscall trace, allocation profile, or deterministic concurrency trace.
+3. **Targeted logs** at the boundaries that distinguish hypotheses.
+4. Never "log everything and grep".
 
 **Tag every debug log** with a unique prefix, e.g. `[DEBUG-a4f2]`. Cleanup at the end becomes a single grep. Untagged logs survive; tagged logs die.
 
-**Perf branch.** For performance regressions, logs are usually wrong. Instead: establish a baseline measurement (timing harness, `performance.now()`, profiler, query plan), then bisect. Measure first, fix second.
+**Perf branch.** For performance regressions, logs are usually wrong. Instead: establish a repeatable baseline with the repository's benchmark, profiler, trace, query plan, or a minimal timing harness, then bisect. Keep build profile, target, features, inputs, and environment equivalent. Measure first, fix second.
 
 ## Phase 5: Fix + regression test
 

@@ -41,6 +41,8 @@ The skill rests on one idea: **depth**. A deep module puts a lot of behaviour be
 
 For each one, it proposes the deepening that fixes it.
 
+Rust systems scans also load [rust-systems-engineering](https://aihero.dev/skills-rust-systems-engineering). They look for ownership, cleanup, cancellation, shutdown, unsafe or FFI assumptions, target and feature details, and measured hot-path costs spread across callers instead of concentrated behind an interface. Their diagrams show crate dependencies, resource lifecycles, concurrency paths, or hot paths when those explain the architecture better than request-response flow.
+
 Each candidate is a card with the files involved, the friction, a plain-English solution, the benefit in terms of **locality** and **leverage**, a before/after diagram, and a strength badge.
 
 | Badge | What it means for you |

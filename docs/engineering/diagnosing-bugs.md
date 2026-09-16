@@ -28,17 +28,21 @@ Phase 1 gets the most effort because it is the only hard phase. The skill lists 
 1. A failing test at whatever seam reaches the bug.
 2. A curl or HTTP script against a running dev server.
 3. A CLI invocation with a fixture input, diffed against a known-good snapshot.
-4. A headless browser script asserting on DOM, console, or network.
-5. A replayed capture: a saved request, payload, or event log, run through the code path in isolation.
-6. A throwaway harness: a minimal subset of the system, one function call.
-7. A property or fuzz loop, for "sometimes wrong output".
-8. A bisection harness you can hand to `git bisect run`.
-9. A differential loop: same input, old version against new.
-10. A [human-in-the-loop](https://www.aihero.dev/ai-coding-dictionary/human-in-the-loop) bash script, last resort. The skill ships `scripts/hitl-loop.template.sh` for this: the agent runs the script, you follow prompts in your terminal, and your answers come back as parseable output.
+4. A process or systems harness asserting on signals, output bytes, resource counts, system calls, or a captured crash.
+5. A headless browser script asserting on DOM, console, or network.
+6. A replayed capture: a saved request, protocol stream, event log, syscall trace, or core dump.
+7. A throwaway harness: a minimal subset of the system, one invocation.
+8. A property or fuzz loop, for "sometimes wrong output".
+9. A stress or controlled-schedule loop for races, deadlocks, cancellation bugs, and resource leaks.
+10. A bisection harness you can hand to `git bisect run`.
+11. A differential loop: same input across versions, targets, or configurations.
+12. A [human-in-the-loop](https://www.aihero.dev/ai-coding-dictionary/human-in-the-loop) bash script, last resort. The skill ships `scripts/hitl-loop.template.sh` for this: the agent runs the script, you follow prompts in your terminal, and your answers come back as parseable output.
 
 *A* loop is not the goal. **Tight** is: fast (seconds), deterministic (same verdict every run), sharp (asserts your exact symptom, not "didn't crash"), and runnable by the agent without you. A 30-second flaky loop is barely better than none. For a bug that only shows up sometimes, the target is not a clean repro but a **higher reproduction rate**: loop the trigger, parallelise, add stress, inject sleeps, until the flake rate is high enough to debug against.
 
 When the agent cannot build one, the skill tells it to stop and say so, list what it tried, and ask you for [environment](https://www.aihero.dev/ai-coding-dictionary/environment) access, a captured artifact, or permission to add temporary instrumentation. It must not go on to form hypotheses anyway.
+
+Rust systems failures also pull in [rust-systems-engineering](https://aihero.dev/skills-rust-systems-engineering), so hypotheses and probes account for unsafe invariants, FFI, cancellation, lock ordering, atomics, resource lifetime, target differences, and measured performance.
 
 ## The gates between phases
 

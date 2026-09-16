@@ -45,6 +45,8 @@ This design exists to avoid a generic review skill that does not know your stand
 
 The **smell baseline** sits under the repo's standards. It is twelve code smells from chapter 3 of Fowler's _Refactoring_: Mysterious Name, Duplicated Code, Feature Envy, Data Clumps, Primitive Obsession, Repeated Switches, Shotgun Surgery, Divergent Change, Speculative Generality, Message Chains, Middle Man, Refused Bequest. Each is a labelled heuristic ("possible Feature Envy"), never a hard violation. Each states what the smell is and how to fix it, so a finding comes with a fix attached rather than only a complaint. Both axes skip anything your linter already enforces.
 
+When the diff contains Rust or systems boundaries, the Standards sub-agent also loads [rust-systems-engineering](https://aihero.dev/skills-rust-systems-engineering). That adds evidence-driven checks for unsafe contracts, panics, arithmetic and conversions, async blocking, lock and atomic correctness, cancellation, resource cleanup, unnecessary allocation or cloning, error context, and feature, target, MSRV, serialization, ABI, or public API changes. Repository standards still override this baseline.
+
 ## Common questions
 
 **It collides with Claude Code's own `/code-review`. What do I do?**
@@ -85,6 +87,7 @@ No. It diffs `<fixed-point>...HEAD`. The three-dot form measures from the merge-
 - It refuses to start on a bad ref or an empty diff, before any sub-agent is spawned.
 - The report arrives as two separate blocks under `## Standards` and `## Spec`, not one merged list.
 - Every Standards finding names either a rule in one of your repo's files or one of the twelve smells, with the hunk quoted; every Spec finding quotes a line of the spec.
+- Rust systems findings name the violated contract or risk and quote the code that creates it, rather than reporting a generic preference.
 - The closing summary gives a worst issue per axis and declines to pick an overall winner.
 - With no spec available, the Spec block says so instead of listing requirements it inferred from the code.
 

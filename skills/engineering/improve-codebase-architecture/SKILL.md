@@ -10,7 +10,8 @@ Surface architectural friction and propose **deepening opportunities**: refactor
 
 This command is _informed_ by the project's domain model and built on a shared design vocabulary:
 
-- Call the Skill tool with "codebase-design" for the architecture vocabulary (**module**, **interface**, **depth**, **seam**, **adapter**, **leverage**, **locality**) and its principles (the deletion test, "the interface is the test surface", "one adapter = hypothetical seam, two = real"). Use these terms exactly in every suggestion, and don't drift into "component," "service," "API," or "boundary."
+- Call the Skill tool with "codebase-design" for the architecture vocabulary (**module**, **interface**, **depth**, **seam**, **adapter**, **leverage**, **locality**) and its principles (the deletion test, "the interface is the test surface", and the rule that one adapter usually means a hypothetical seam while two usually make it real). Use these terms exactly in every suggestion, and don't drift into "component," "service," "API," or "boundary."
+- If the scan covers Rust or Cargo code, or crosses unsafe, FFI, concurrency, async, operating-system, embedded, compatibility, or performance-sensitive code, call the Skill tool with "rust-systems-engineering". Treat contracts, resource ownership, safety invariants, target and feature boundaries, and measured hot paths as part of the architecture.
 - The domain language in `GLOSSARY.md` gives names to good seams; ADRs in `docs/adr/` record decisions this command should not re-litigate.
 
 ## Process
@@ -31,6 +32,10 @@ Then spawn a sub-agent to walk the codebase. Don't follow rigid heuristics; expl
 - Where have pure functions been extracted just for testability, but the real bugs hide in how they're called (no **locality**)?
 - Where do tightly-coupled modules leak across their seams?
 - Which parts of the codebase are untested, or hard to test through their current interface?
+- Where are ownership, cleanup, cancellation, or shutdown rules spread across callers instead of concentrated behind one interface?
+- Where do unsafe or FFI assumptions leak into safe callers?
+- Where do crate, feature, target, or platform boundaries expose configuration detail rather than one stable contract?
+- Where does a measured hot path bounce through abstractions, allocations, locks, or syscalls without buying leverage?
 
 Apply the **deletion test** to anything you suspect is shallow: would deleting it concentrate complexity, or just move it? A "yes, concentrates" is the signal you want.
 
@@ -46,7 +51,7 @@ For each candidate, render a card with:
 - **Problem**: why the current architecture is causing friction
 - **Solution**: plain English description of what would change
 - **Benefits**: explained in terms of locality and leverage, and how tests would improve
-- **Before / After diagram**: side-by-side, custom-drawn, illustrating the shallowness and the deepening
+- **Before / After diagram**: side-by-side, custom-drawn, illustrating the shallowness and the deepening. For systems code, show the relevant crate dependencies, ownership or resource lifecycle, concurrency path, or hot path instead of forcing a request-response diagram.
 - **Recommendation strength**: one of `Strong`, `Worth exploring`, `Speculative`, rendered as a badge
 
 End the report with a **Top recommendation** section: which candidate you'd tackle first and why.
